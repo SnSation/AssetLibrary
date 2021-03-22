@@ -1,15 +1,11 @@
 from .main import AssetLibrary
 
+# Return an 'AssetLibrary' object without running any methods
 def new():
     new_object = AssetLibrary()
     return new_object
 
-def new_default():
-    new_object = AssetLibrary()
-    new_object.set_default()
-    return new_object
-
-# Check object readiness, then run the 'main' method
+# If no 'AssetLibrary' is given, instatiate one, then run its 'main' method
 # Start Settings:
     # 'standard' = check object readiness -> run the main method
     # 'default' = set the object's default attributes -> run the 'main' method
@@ -24,13 +20,11 @@ def start(start_setting='standard', target_obj=None):
 
     # Standard Start
     if start_setting == 'standard':
-        if main_obj.get_ready() == True:
-            main_obj.main()
-        else:
-            print(f'{main_obj.name} is not ready to start.')
+        main_obj.start()
     # Start with AssetLibrary's default attributes
     elif start_setting == 'default':
-        main_obj.default_start()
+        main_obj.set_default()
+        main_obj.start()
     # Start without checking for readiness
     elif start_setting == 'force':
         main_obj.main()
