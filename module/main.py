@@ -1,10 +1,11 @@
 # Import Required Packages
 import os
+from .utils import FileManager, ModelManager
 
 
-# 'AssetLibrary' is the main object of this file.
-# All code in this file relates directly to the 'AssetLibrary' object.
-class AssetLibrary:
+# 'AssetManager' is the main object of this file.
+# All code in this file relates directly to the 'AssetManager' object.
+class AssetManager:
     # Sections:
         # 1. Class Variables
         # 2. Special Methods
@@ -13,7 +14,6 @@ class AssetLibrary:
         # 5. Directory Methods
         # 6. Image Methods
         # 7. Audio Methods
-        # 8. 
 
     ##### Key #####
         # Name as a string = 'name' OR 'target_name'
@@ -29,17 +29,21 @@ class AssetLibrary:
         # Other = 'targetvariable_expectation'
 
     ##### Class Variables #####
-    class_name = 'AssetLibrary'
+    class_name = 'AssetManager'
 
     ##### Special Methods #####
     def __init__(self):
         self.attribute_list = ["name", "ready", "assets"]
         self.name = None
         self.ready = False
-        self.asset_paths = None
+        self.paths = None
+        self.root = os.path.dirname(os.path.abspath(__file__))
+        self.model_manager = None
+        self.file_manager = FileManager(self.root)
+
     
     def __repr__(self):
-        return f'< AssetLibrary | Name: {self.name} >'
+        return f'< AssetManager | Name: {self.name} >'
 
     ##### Getters and Setters #####
     def set_name(self, name):
@@ -54,11 +58,29 @@ class AssetLibrary:
     def get_ready(self):
         return self.ready
 
-    def set_asset_paths(self, paths_dict):
-        self.asset_paths = paths_dict
+    def set_paths(self, paths_dict):
+        self.paths = paths_dict
 
-    def get_asset_paths(self):
-        return self.asset_paths
+    def get_paths(self):
+        return self.paths
+
+    def set_root(self, root_path):
+        self.root = root_path
+
+    def get_root(self):
+        return self.root
+
+    def set_model_manager(self, model_manager_obj):
+        self.models = model_manager_obj
+
+    def get_model_manager(self):
+        return self.models
+
+    def set_file_manager(self, file_manager_obj):
+        self.files = file_manager_obj
+
+    def get_file_manager(self):
+        return self.file_manager
 
     ##### Attribute Methods #####
 
@@ -70,7 +92,7 @@ class AssetLibrary:
             "attribute_list":self.attribute_list,
             "name": self.name,
             "ready": self.ready,
-            "asset_paths": self.asset_paths
+            "paths": self.paths
         }
 
         return attribute_dict
@@ -95,64 +117,47 @@ class AssetLibrary:
     def default_ready(self):
         self.ready = False
 
-    def default_asset_paths(self):
-        this_file = os.path.abspath(__file__)
-        this_module = os.path.dirname(this_file)
-        default_asset_paths = {}
-        default_asset_paths["assets"] = os.path.join(this_module, "assets")
-
-        subdirectory_list = ["images", "audio", "data", "models", "other"]
-        for directory in subdirectory_list:
-            default_asset_paths[directory] = os.path.join(default_asset_paths["assets"], directory)
-
-        self.asset_paths = default_asset_paths
-
-        for k, v in self.asset_paths.items():
-            if not os.path.isdir(v):
-                os.mkdir(v)
-                print(f"{k} Directory Created")
+    def default_paths(self):
+        self.file_manager.default_paths()
 
     ##### Directory Methods #####
-    
-    def get_module_path(self):
-        return os.path.dirname(os.path.abspath(__file__))
 
     def start_directories(self):
         # Check the current asset location.
         # If it is incorrect, create a usable path
-        if self.asset_paths == None:
+        if self.paths == None:
             print("Creating Default Paths")
-            self.default_asset_paths()
-        elif not os.path.isdir(self.asset_paths["assets"]):
+            self.default_paths()
+        elif not os.path.isdir(self.paths["assets"]):
             # Create the 'assets' directory
-            current_parent = os.path.dirname(self.asset_paths["assets"])
-            self.asset_paths["assets"] = os.path.join(current_parent, "assets")
-            os.mkdir(self.asset_paths["assets"])
+            current_parent = os.path.dirname(self.paths["assets"])
+            self.paths["assets"] = os.path.join(current_parent, "assets")
+            os.mkdir(self.paths["assets"])
 
             # Create Required Subdirectories
             subdirectory_list = ["images", "audio", "data", "models", "other"]
             for subdirectory in subdirectory_list:
-                self.asset_paths[subdirectory] = os.path.join(self.asset_paths["assets"], subdirectory)
-                os.mkdir(self.asset_paths[subdirectory])
+                self.paths[subdirectory] = os.path.join(self.paths["assets"], subdirectory)
+                os.mkdir(self.paths[subdirectory])
 
     def check_directories(self):
         required_directories = ["assets", "images", "audio", "data", "models", "other"]
         try:
             # Check if the asset directories exist
             for directory in required_directories:
-                if directory not in self.asset_paths.keys():
+                if directory not in self.paths.keys():
                     print(f"{directory} not in asset path dictionary")
                     return False
-                elif os.path.exists(self.asset_paths[directory]) == False:
+                elif os.path.exists(self.paths[directory]) == False:
                     print(f"{directory} is missing from path")
                     return False
                 else:
-                    print(f"{directory} - OK | {self.asset_paths[directory]}")
+                    print(f"{directory} - OK | {self.paths[directory]}")
         
             print("Directories Ready")
             return True
         except:
-            print("Path Error: Try using the 'start_directories', 'default_asset_paths', or 'set_default' methods.")
+            print("Path Error: Try using the 'start_directories', 'default_paths', or 'set_default' methods.")
             return False
 
     ##### Image File Methods #####
@@ -204,7 +209,7 @@ class AssetLibrary:
     def set_default(self):
         self.default_name()
         self.default_ready()
-        self.default_asset_paths()
+        self.default_paths()
         self.start_directories()
 
         # Set 'self.ready' to 'True'

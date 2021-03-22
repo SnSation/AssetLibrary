@@ -1,8 +1,8 @@
-from .main import AssetLibrary
+from .main import AssetManager
 
 # Return an 'AssetLibrary' object without running any methods
 def new():
-    new_object = AssetLibrary()
+    new_object = AssetManager()
     return new_object
 
 # If no 'AssetLibrary' is given, instatiate one, then run its 'main' method
@@ -14,7 +14,7 @@ def start(start_setting='standard', target_obj=None):
     main_obj = target_obj
     # If no target object is given, create an instance of 'AssetLibrary' to target
     if main_obj == None:
-        main_obj = AssetLibrary()
+        main_obj = AssetManager()
 
     print(f'Start: {main_obj.class_name}.main()')
 
